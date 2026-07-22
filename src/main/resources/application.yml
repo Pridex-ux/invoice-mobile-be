@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: invoice-mobile-be
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-binding-errors: always
