@@ -10,7 +10,7 @@ public class TemplateSettings {
 
     public TemplateSettings() {
         this.selectedTheme = "modern";
-        this.showStamp = true;
+        this.showStamp = false;
         this.showQrCode = false;
         this.showSignature = true;
         this.footerNotes = "";
