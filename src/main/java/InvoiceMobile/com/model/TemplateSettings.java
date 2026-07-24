@@ -11,9 +11,9 @@ public class TemplateSettings {
     public TemplateSettings() {
         this.selectedTheme = "modern";
         this.showStamp = true;
-        this.showQrCode = true;
+        this.showQrCode = false;
         this.showSignature = true;
-        this.footerNotes = "Terima kasih atas kepercayaan Anda bertransaksi dengan Smart Invoice Studio.";
+        this.footerNotes = "";
         this.paymentTerms = "Pembayaran dianggap sah setelah dana masuk ke rekening bank yang tercantum.";
     }
 
