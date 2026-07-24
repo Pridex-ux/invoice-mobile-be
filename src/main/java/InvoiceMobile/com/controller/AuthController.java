@@ -13,7 +13,7 @@ import java.util.Map;
 @CrossOrigin
 public class AuthController {
 
-    @Value("${google.client.id:469979061899-2asbrr7ug7d8cgo9g12bj25nsi7ec0tb.apps.googleusercontent.com}")
+    @Value("${google.client.id:469979061899-v4nngv1ms8v1dda42kebmiv1e4c5tk6d.apps.googleusercontent.com}")
     private String googleClientId;
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -53,8 +53,13 @@ public class AuthController {
                 "userId", googleUserId
             ));
         } catch (Exception e) {
+            e.printStackTrace();
+            String errorMsg = e.getMessage();
+            if (errorMsg == null) {
+                errorMsg = e.getClass().getName();
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Verification failed: " + e.getMessage()));
+                    .body(Map.of("error", "Verification failed: " + errorMsg));
         }
     }
 }
