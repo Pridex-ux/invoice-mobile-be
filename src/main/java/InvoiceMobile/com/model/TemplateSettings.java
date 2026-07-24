@@ -1,12 +1,25 @@
 package InvoiceMobile.com.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "template_settings")
 public class TemplateSettings {
+    @Id
+    private String id = "main";
     private String selectedTheme;
     private boolean showStamp;
     private boolean showQrCode;
     private boolean showSignature;
+
+    @Column(columnDefinition = "TEXT")
     private String footerNotes;
+
+    @Column(columnDefinition = "TEXT")
     private String paymentTerms;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public TemplateSettings() {
         this.selectedTheme = "modern";

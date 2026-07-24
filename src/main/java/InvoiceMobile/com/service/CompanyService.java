@@ -1,20 +1,22 @@
 package InvoiceMobile.com.service;
 
 import InvoiceMobile.com.model.CompanyIdentity;
+import InvoiceMobile.com.repository.CompanyIdentityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class CompanyService {
-    private final AtomicReference<CompanyIdentity> companyStore = new AtomicReference<>(null);
+
+    @Autowired
+    private CompanyIdentityRepository companyIdentityRepository;
 
     public CompanyIdentity getCompanyIdentity() {
-        return companyStore.get();
+        return companyIdentityRepository.findById("main").orElse(null);
     }
 
     public CompanyIdentity saveCompanyIdentity(CompanyIdentity identity) {
-        companyStore.set(identity);
-        return identity;
+        identity.setId("main");
+        return companyIdentityRepository.save(identity);
     }
 }

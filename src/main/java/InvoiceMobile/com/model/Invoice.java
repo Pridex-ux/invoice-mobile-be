@@ -1,13 +1,24 @@
 package InvoiceMobile.com.model;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "invoices")
 public class Invoice {
+    @Id
     private String id;
     private String invoiceNumber;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "invoice_id")
     private List<InvoiceItem> items = new ArrayList<>();
+
     private double subtotal;
     private double discountPercentage;
     private double discountAmount;
@@ -16,10 +27,18 @@ public class Invoice {
     private double totalAmount;
     private double totalPaid;
     private double remainingAmount;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
+
     private String issueDate;
     private String dueDate;
+
+    @Embedded
     private TermOption terms = new TermOption(true, 0, 3);
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "invoice_id")
     private List<PaymentRecord> paymentHistory = new ArrayList<>();
 
     public Invoice() {}

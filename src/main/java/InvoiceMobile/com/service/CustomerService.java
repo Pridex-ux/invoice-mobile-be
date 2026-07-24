@@ -1,26 +1,30 @@
 package InvoiceMobile.com.service;
 
 import InvoiceMobile.com.model.Customer;
+import InvoiceMobile.com.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
-    private final Map<String, Customer> customerRepository = new ConcurrentHashMap<>();
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     public CustomerService() {
-        // Empty constructor - no mock data
+        // Empty constructor
     }
 
     public List<Customer> getAllCustomers(String search) {
+        List<Customer> all = customerRepository.findAll();
         if (search == null || search.trim().isEmpty()) {
-            return new ArrayList<>(customerRepository.values());
+            return all;
         }
         String q = search.toLowerCase().trim();
-        return customerRepository.values().stream()
+        return all.stream()
                 .filter(c -> (c.getName() != null && c.getName().toLowerCase().contains(q)) ||
                              (c.getPhone() != null && c.getPhone().contains(q)) ||
                              (c.getEmail() != null && c.getEmail().toLowerCase().contains(q)))
@@ -28,30 +32,31 @@ public class CustomerService {
     }
 
     public Optional<Customer> getCustomerById(String id) {
-        return Optional.ofNullable(customerRepository.get(id));
+        return customerRepository.findById(id);
     }
 
     public Customer createCustomer(Customer customer) {
         if (customer.getId() == null || customer.getId().trim().isEmpty()) {
             customer.setId("cust-" + System.currentTimeMillis());
         }
-        customerRepository.put(customer.getId(), customer);
-        return customer;
+        return customerRepository.save(customer);
     }
 
     public Customer updateCustomer(String id, Customer updatedData) {
-        Customer existing = customerRepository.get(id);
-        if (existing != null) {
+        return customerRepository.findById(id).map(existing -> {
             if (updatedData.getName() != null) existing.setName(updatedData.getName());
             if (updatedData.getPhone() != null) existing.setPhone(updatedData.getPhone());
             if (updatedData.getEmail() != null) existing.setEmail(updatedData.getEmail());
             if (updatedData.getAddress() != null) existing.setAddress(updatedData.getAddress());
-            return existing;
-        }
-        return null;
+            return customerRepository.save(existing);
+        }).orElse(null);
     }
 
     public boolean deleteCustomer(String id) {
-        return customerRepository.remove(id) != null;
+        if (customerRepository.existsById(id)) {
+            customerRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

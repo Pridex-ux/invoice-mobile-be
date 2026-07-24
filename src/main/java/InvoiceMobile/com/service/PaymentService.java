@@ -61,6 +61,8 @@ public class PaymentService {
             inv.setStatus(PaymentStatus.CICILAN);
         }
 
+        inv = invoiceService.saveInvoice(inv);
+
         Map<String, Object> result = new HashMap<>();
         result.put("payment", record);
         result.put("updatedInvoice", inv);

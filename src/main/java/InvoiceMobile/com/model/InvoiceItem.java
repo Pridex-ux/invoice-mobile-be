@@ -1,6 +1,13 @@
 package InvoiceMobile.com.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "invoice_items")
 public class InvoiceItem {
+    @Id
     private String id;
     private String description;
     private int quantity;

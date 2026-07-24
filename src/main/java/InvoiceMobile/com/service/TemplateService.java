@@ -1,20 +1,22 @@
 package InvoiceMobile.com.service;
 
 import InvoiceMobile.com.model.TemplateSettings;
+import InvoiceMobile.com.repository.TemplateSettingsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class TemplateService {
-    private final AtomicReference<TemplateSettings> templateStore = new AtomicReference<>(new TemplateSettings());
+
+    @Autowired
+    private TemplateSettingsRepository templateSettingsRepository;
 
     public TemplateSettings getTemplateSettings() {
-        return templateStore.get();
+        return templateSettingsRepository.findById("main").orElseGet(TemplateSettings::new);
     }
 
     public TemplateSettings saveTemplateSettings(TemplateSettings settings) {
-        templateStore.set(settings);
-        return settings;
+        settings.setId("main");
+        return templateSettingsRepository.save(settings);
     }
 }

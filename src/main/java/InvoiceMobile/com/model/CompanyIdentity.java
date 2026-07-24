@@ -1,6 +1,12 @@
 package InvoiceMobile.com.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "company_identity")
 public class CompanyIdentity {
+    @Id
+    private String id = "main";
     private String companyName;
     private String email;
     private String phone;
@@ -15,10 +21,17 @@ public class CompanyIdentity {
     private String bankName;
     private String accountNumber;
     private String accountHolder;
+
+    @Column(columnDefinition = "TEXT")
     private String logoUri;
+
+    @Column(columnDefinition = "TEXT")
     private String signatureUri;
 
     public CompanyIdentity() {}
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getCompanyName() { return companyName; }
     public void setCompanyName(String companyName) { this.companyName = companyName; }

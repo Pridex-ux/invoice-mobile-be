@@ -2,35 +2,30 @@ package InvoiceMobile.com.service;
 
 import InvoiceMobile.com.dto.CreateInvoiceRequest;
 import InvoiceMobile.com.model.*;
+import InvoiceMobile.com.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
 public class InvoiceService {
 
-    private final Map<String, Invoice> invoiceRepository = new ConcurrentHashMap<>();
-    private final AtomicLong invoiceCounter = new AtomicLong(3);
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
     @Autowired
     private CustomerService customerService;
 
     public InvoiceService() {
-        // Seed Initial Invoices (inv-101, inv-102, inv-103)
-        initSeedData();
-    }
-
-    private void initSeedData() {
-        // Empty - no mock data
+        // Empty constructor
     }
 
     public List<Invoice> getInvoices(PaymentStatus status, String search) {
-        return invoiceRepository.values().stream()
+        List<Invoice> all = invoiceRepository.findAll();
+        return all.stream()
                 .filter(inv -> {
                     if (status != null && inv.getStatus() != status) return false;
                     if (search != null && !search.trim().isEmpty()) {
@@ -46,11 +41,15 @@ public class InvoiceService {
     }
 
     public Optional<Invoice> getInvoiceById(String id) {
-        return Optional.ofNullable(invoiceRepository.get(id));
+        return invoiceRepository.findById(id);
+    }
+
+    public Invoice saveInvoice(Invoice invoice) {
+        return invoiceRepository.save(invoice);
     }
 
     public Invoice createInvoice(CreateInvoiceRequest req) {
-        long count = invoiceCounter.incrementAndGet();
+        long count = invoiceRepository.count() + 1;
         String id = (req.getId() != null && !req.getId().trim().isEmpty()) ? req.getId() : "inv-" + System.currentTimeMillis();
         String invNo = (req.getInvoiceNumber() != null && !req.getInvoiceNumber().trim().isEmpty()) ? req.getInvoiceNumber() : String.format("INV-2026-%03d", count);
 
@@ -61,9 +60,7 @@ public class InvoiceService {
         // Customer binding / creation
         Customer cust = req.getCustomer();
         if (cust != null) {
-            if (cust.getId() == null || cust.getId().isEmpty()) {
-                cust = customerService.createCustomer(cust);
-            }
+            cust = customerService.createCustomer(cust);
             inv.setCustomer(cust);
         }
 
@@ -107,22 +104,23 @@ public class InvoiceService {
             inv.getPaymentHistory().add(dpRecord);
         }
 
-        invoiceRepository.put(id, inv);
-        return inv;
+        return invoiceRepository.save(inv);
     }
 
     public Invoice updateInvoice(String id, Invoice updateData) {
-        Invoice existing = invoiceRepository.get(id);
-        if (existing != null) {
+        return invoiceRepository.findById(id).map(existing -> {
             if (updateData.getStatus() != null) existing.setStatus(updateData.getStatus());
             if (updateData.getDueDate() != null) existing.setDueDate(updateData.getDueDate());
             if (updateData.getTotalAmount() > 0) existing.setTotalAmount(updateData.getTotalAmount());
-            return existing;
-        }
-        return null;
+            return invoiceRepository.save(existing);
+        }).orElse(null);
     }
 
     public boolean deleteInvoice(String id) {
-        return invoiceRepository.remove(id) != null;
+        if (invoiceRepository.existsById(id)) {
+            invoiceRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

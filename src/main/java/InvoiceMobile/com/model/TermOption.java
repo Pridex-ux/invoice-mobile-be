@@ -1,5 +1,8 @@
 package InvoiceMobile.com.model;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class TermOption {
     private boolean allowInstallment;
     private double minimumDpPercent;
